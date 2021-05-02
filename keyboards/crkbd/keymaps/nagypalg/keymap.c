@@ -223,10 +223,21 @@ void render_logo(void) {
 }
 
 void render_layer_state(void) {
-    static const char PROGMEM default_layer[] = {
+    static const char PROGMEM base_layer[] = {
         0x20, 0x94, 0x95, 0x96, 0x20,
         0x20, 0xb4, 0xb5, 0xb6, 0x20,
         0x20, 0xd4, 0xd5, 0xd6, 0x20, 0};
+
+    static const char PROGMEM num_layer[] = {
+        0x20, 0x94, 0x95, 0x96, 0x20,
+        0x20, 0xb4, 0xb5, 0xb6, 0x20,
+        0x20, 0xd7, 0xd8, 0xd9, 0x20, 0};
+
+    static const char PROGMEM sym_layer[] = {
+        0x20, 0x94, 0x95, 0x96, 0x20,
+        0x20, 0xb4, 0xb5, 0xb6, 0x20,
+        0x20, 0xda, 0xdb, 0xdc, 0x20, 0};
+
     // static const char PROGMEM raise_layer[] = {
     //     0x20, 0x97, 0x98, 0x99, 0x20,
     //     0x20, 0xb7, 0xb8, 0xb9, 0x20,
@@ -235,18 +246,33 @@ void render_layer_state(void) {
     //     0x20, 0x9a, 0x9b, 0x9c, 0x20,
     //     0x20, 0xba, 0xbb, 0xbc, 0x20,
     //     0x20, 0xda, 0xdb, 0xdc, 0x20, 0};
-    static const char PROGMEM adjust_layer[] = {
+    static const char PROGMEM other_layer[] = {
         0x20, 0x9d, 0x9e, 0x9f, 0x20,
         0x20, 0xbd, 0xbe, 0xbf, 0x20,
         0x20, 0xdd, 0xde, 0xdf, 0x20, 0};
 
-    uint8_t layer = get_highest_layer(layer_state);
+    // uint8_t layer = get_highest_layer(layer_state);
 
-    if(layer > _BASE) {
-        oled_write_P(adjust_layer, false);
-    } else {
-        oled_write_P(default_layer, false);
+    switch (get_highest_layer(layer_state)) {
+    case _BASE:
+        oled_write_P(base_layer, false);
+        break;
+    case _NUM:
+        oled_write_P(num_layer, false);
+        break;
+    case _SYM:
+        oled_write_P(sym_layer, false);
+        break;
+    default:
+        oled_write_P(other_layer, false);
+        break;
     }
+
+    // if(layer > _BASE) {
+    //     oled_write_P(adjust_layer, false);
+    // } else {
+    //     oled_write_P(default_layer, false);
+    // }
 
 
     // if(layer_state_is(_ADJUST)) {
