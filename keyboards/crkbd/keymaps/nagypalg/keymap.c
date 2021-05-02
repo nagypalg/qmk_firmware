@@ -2,10 +2,7 @@
 
 extern keymap_config_t keymap_config;
 
-#ifdef RGBLIGHT_ENABLE
-//Following line allows macro to read current RGB settings
-extern rgblight_config_t rgblight_config;
-#endif
+
 
 #ifdef OLED_DRIVER_ENABLE
 static uint32_t oled_timer = 0;
@@ -67,6 +64,57 @@ int RGB_current_mode;
 //     layer_off(layer3);
 //   }
 // }
+
+#ifdef RGBLIGHT_ENABLE
+//Following line allows macro to read current RGB settings
+extern rgblight_config_t rgblight_config;
+
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+  rgblight_sethsv_noeeprom(HSV_WHITE);
+  switch(get_highest_layer(state)) {
+  case 1:
+    // Green
+    rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_GREEN);
+    break;
+  case 2:
+    // Red
+    rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_RED);
+    break;
+  case 3:
+    // Blue
+    rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_BLUE);
+    break;
+  case 4:
+    // Orange
+    rgblight_enable_noeeprom();
+//    rgblight_sethsv_noeeprom(HSV_PURPLE);
+    rgblight_sethsv_noeeprom(HSV_ORANGE);
+    break;
+  case 5:
+    // Orange
+    rgblight_enable_noeeprom();
+//    rgblight_sethsv_noeeprom(HSV_PURPLE);
+    rgblight_sethsv_noeeprom(HSV_YELLOW);
+    break;
+  default:
+    // White
+    //Read RGB Light State
+    rgblight_config.raw = eeconfig_read_rgblight();
+    //If enabled, set white
+    if (rgblight_config.enable) {
+		rgblight_sethsv_noeeprom(HSV_WHITE);
+	} else { //Otherwise go back to disabled
+		rgblight_disable_noeeprom();
+	}
+    break;
+}
+return state;
+}
+#endif
 
 void matrix_init_user(void) {
     #ifdef RGBLIGHT_ENABLE
@@ -422,3 +470,5 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // }
 
 // #endif
+
+
