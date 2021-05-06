@@ -15,55 +15,43 @@ extern uint8_t is_master;
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
 // entirely and just use numbers.
 enum layers {
-  _BASE,
-  _NUM,
-  _SYM,
-  _NAV,
-  _FUNC,
-  _MOUSE
+  _BASE, // 0
+  _NUM, // 1
+  _SYM, // 2
+  _NAV, // 3
+  _FUNC, // 4
+  _MOUSE // 5
 };
 
 // Custom keycodes
 
 #define FUNC_TAB_CKC LT(_FUNC,KC_TAB)
-#define NUM_CKC MO(_NUM)
-#define SYM_CKC MO(_SYM)
-#define NAV_CKC MO(_NAV)
-#define MOUSE_CKC TO(_MOUSE)
-#define BASE_CKC TO(_BASE)
 
 #define C_S_V LCTL(LSFT(KC_V))
 #define C_S_F LCTL(LSFT(KC_F))
 
+// kept it for reference
+// enum custom_keycodes {
+//   QWERTY = SAFE_RANGE,
+//   LOWER,
+//   RAISE,
+//   ADJUST,
+//   RGBRST,
+//   KC_RACL // right alt / colon
+// };
 
-enum custom_keycodes {
-  QWERTY = SAFE_RANGE,
-  LOWER,
-  RAISE,
-  ADJUST,
-  RGBRST,
-  KC_RACL // right alt / colon
-};
-
+// Copy-paste from nagypalg.c
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-	[0] = LAYOUT_split_3x6_3(KC_DEL, KC_Q, LGUI_T(KC_W), LCTL_T(KC_F), KC_P, KC_B, KC_J, KC_L, RCTL_T(KC_U), RGUI_T(KC_Y), KC_QUOT, KC_RSFT, KC_BSPC, KC_A, LALT_T(KC_R), LCTL_T(KC_S), LSFT_T(KC_T), KC_G, KC_M, RSFT_T(KC_N), RCTL_T(KC_E), RALT_T(KC_I), KC_O, KC_SCLN, KC_CAPS, KC_Z, KC_X, KC_C, KC_D, KC_V, KC_K, KC_H, KC_COMM, KC_DOT, KC_SLSH, KC_ESC, NAV_CKC, NUM_CKC, FUNC_TAB_CKC, KC_BSPC, KC_SPC, KC_TAB),
-	[1] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_LGUI, LCTL(KC_F), KC_NO, KC_NO, KC_NO, KC_7, KC_8, KC_9, KC_NO, KC_NO, KC_TRNS, KC_LSFT, KC_LALT, KC_LCTL, SYM_CKC, KC_NO, KC_NO, KC_4, KC_5, KC_6, KC_0, KC_NO, KC_TRNS, LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C), LCTL(KC_D), LCTL(KC_V), KC_NO, KC_1, KC_2, KC_3, KC_MINS, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_DEL, KC_ENT, KC_TAB),
-	[2] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_LCBR, KC_RCBR, KC_GRV, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_LPRN, KC_RPRN, KC_SCLN, KC_EQL, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_LBRC, KC_RBRC, KC_BSLS, KC_MINS, KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_DEL, KC_ENT, KC_TAB),
-	[3] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_INS, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, MOUSE_CKC, KC_NO, KC_HOME, KC_PGDN, KC_PGUP, KC_END, KC_NO, KC_TRNS, LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C), LCTL(KC_D), LCTL(KC_V), KC_NO, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_DEL, KC_ENT, KC_TAB),
-	[4] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_LGUI, C_S_F, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F11, KC_TRNS, KC_TRNS, KC_ESC, KC_LALT, KC_LCTL, KC_LSFT, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F10, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, C_S_V, KC_NO, KC_F1, KC_F2, KC_F3, KC_F12, KC_TRNS, KC_NO, KC_NO, KC_TRNS, KC_DEL, KC_ENT, KC_TAB),
-	[5] = LAYOUT_split_3x6_3(BL_TOGG, KC_MPRV, KC_LGUI, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, RESET, RGB_TOG, KC_LSFT, KC_LALT, KC_LCTL, KC_RSFT, KC_TRNS, KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, KC_NO, KC_NO, KC_NO, KC_ACL0, KC_ACL1, KC_ACL2, KC_NO, KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, KC_NO, KC_NO, BASE_CKC, KC_NO, KC_BTN2, KC_BTN1, KC_BTN3)
+	[0] = LAYOUT_split_3x6_3(TT(5), KC_Q, LGUI_T(KC_W), LCTL_T(KC_F), KC_P, KC_B, KC_J, KC_L, RCTL_T(KC_U), RGUI_T(KC_Y), KC_QUOT, KC_RSFT, KC_BSPC, KC_A, LALT_T(KC_R), LCTL_T(KC_S), LSFT_T(KC_T), KC_G, KC_M, RSFT_T(KC_N), RCTL_T(KC_E), RALT_T(KC_I), KC_O, KC_SCLN, KC_CAPS, KC_Z, KC_X, KC_C, KC_D, KC_V, KC_K, KC_H, KC_COMM, KC_DOT, KC_SLSH, KC_ESC, MO(3), MO(1), FUNC_TAB_CKC, KC_BSPC, KC_SPC, KC_ENT),
+	[1] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_LGUI, LCTL(KC_F), KC_NO, KC_NO, KC_NO, KC_7, KC_8, KC_9, KC_NO, KC_NO, KC_TRNS, KC_LSFT, KC_LALT, KC_LCTL, MO(2), KC_NO, KC_NO, KC_4, KC_5, KC_6, KC_0, KC_NO, KC_TRNS, LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C), LCTL(KC_D), LCTL(KC_V), KC_NO, KC_1, KC_2, KC_3, KC_MINS, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
+	[2] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_LCBR, KC_RCBR, KC_GRV, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_LPRN, KC_RPRN, KC_SCLN, KC_EQL, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_LBRC, KC_RBRC, KC_BSLS, KC_MINS, KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
+	[3] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_INS, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TO(5), KC_NO, KC_HOME, KC_PGDN, KC_PGUP, KC_END, KC_NO, KC_TRNS, LCTL(KC_Z), LCTL(KC_X), LCTL(KC_C), LCTL(KC_D), LCTL(KC_V), KC_NO, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
+	[4] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_LGUI, C_S_F, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F11, KC_TRNS, KC_TRNS, KC_ESC, KC_LALT, KC_LCTL, KC_LSFT, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F10, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, C_S_V, KC_NO, KC_F1, KC_F2, KC_F3, KC_F12, KC_TRNS, KC_NO, KC_NO, KC_TRNS, KC_DEL, KC_TRNS, KC_TRNS),
+	[5] = LAYOUT_split_3x6_3(KC_TRNS, KC_MPRV, KC_LGUI, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, RESET, RGB_TOG, KC_LSFT, KC_LALT, KC_LCTL, KC_RSFT, KC_TRNS, KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, KC_NO, KC_NO, KC_NO, KC_ACL0, KC_ACL1, KC_ACL2, KC_NO, KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, KC_NO, KC_BTN3, KC_BTN1, KC_BTN2, KC_BTN2, KC_BTN1, KC_BTN3)
 };
+
 
 int RGB_current_mode;
-
-// Setting ADJUST layer RGB back to default
-// void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-//   if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-//     layer_on(layer3);
-//   } else {
-//     layer_off(layer3);
-//   }
-// }
 
 #ifdef RGBLIGHT_ENABLE
 //Following line allows macro to read current RGB settings
@@ -71,56 +59,50 @@ extern rgblight_config_t rgblight_config;
 
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-  rgblight_sethsv_noeeprom(HSV_WHITE);
+//   rgblight_sethsv_noeeprom(HSV_CORAL);
   switch(get_highest_layer(state)) {
   case 1:
-    // Green
-    rgblight_enable_noeeprom();
+    //rgblight_enable_noeeprom();
     rgblight_sethsv_noeeprom(HSV_GREEN);
     break;
   case 2:
-    // Red
-    rgblight_enable_noeeprom();
-    rgblight_sethsv_noeeprom(HSV_RED);
+    //rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_CHARTREUSE);
     break;
   case 3:
-    // Blue
-    rgblight_enable_noeeprom();
-    rgblight_sethsv_noeeprom(HSV_BLUE);
-    break;
-  case 4:
-    // Orange
-    rgblight_enable_noeeprom();
-//    rgblight_sethsv_noeeprom(HSV_PURPLE);
+    //rgblight_enable_noeeprom();
     rgblight_sethsv_noeeprom(HSV_ORANGE);
     break;
+  case 4:
+    //rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_BLUE);
+    break;
   case 5:
-    // Orange
-    rgblight_enable_noeeprom();
-//    rgblight_sethsv_noeeprom(HSV_PURPLE);
+    //rgblight_enable_noeeprom();
     rgblight_sethsv_noeeprom(HSV_YELLOW);
     break;
   default:
-    // White
+    // base layer
+    rgblight_sethsv_noeeprom(HSV_CORAL);
     //Read RGB Light State
-    rgblight_config.raw = eeconfig_read_rgblight();
+    // rgblight_config.raw = eeconfig_read_rgblight();
     //If enabled, set white
-    if (rgblight_config.enable) {
-		rgblight_sethsv_noeeprom(HSV_WHITE);
-	} else { //Otherwise go back to disabled
-		rgblight_disable_noeeprom();
-	}
+    // if (rgblight_config.enable) {
+	// 	rgblight_sethsv_noeeprom(HSV_WHITE);
+	// } else { //Otherwise go back to disabled
+	// 	rgblight_disable_noeeprom();
+	// }
     break;
 }
 return state;
 }
 #endif
 
-void matrix_init_user(void) {
-    #ifdef RGBLIGHT_ENABLE
-      RGB_current_mode = rgblight_config.mode;
-    #endif
-}
+// void matrix_init_user(void) {
+//     #ifdef RGBLIGHT_ENABLE
+//       RGB_current_mode = rgblight_config.mode;
+//     #endif
+// }
 
 #ifdef OLED_DRIVER_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
