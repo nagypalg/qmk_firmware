@@ -2,11 +2,7 @@
 
 extern keymap_config_t keymap_config;
 
-
-
-#ifdef OLED_DRIVER_ENABLE
-static uint32_t oled_timer = 0;
-#endif
+static uint32_t inactivity_timer = 0;
 
 extern uint8_t is_master;
 
@@ -52,7 +48,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 
-int RGB_current_mode;
+// int RGB_current_mode;
 
 #ifdef RGBLIGHT_ENABLE
 //Following line allows macro to read current RGB settings
@@ -360,7 +356,7 @@ void render_status_secondary(void) {
 }
 
 void oled_task_user(void) {
-    if (timer_elapsed32(oled_timer) > 30000) {
+    if (timer_elapsed32(inactivity_timer) > 30000) {
         oled_off();
         return;
     }
@@ -377,11 +373,23 @@ void oled_task_user(void) {
 
 #endif
 
+void matrix_scan_user(void) {
+    #ifdef RGBLIGHT_ENABLE
+    if (timer_elapsed32(inactivity_timer) > 30000) {
+        rgblight_disable_noeeprom();
+        return;
+    }
+    #endif
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
-#ifdef OLED_DRIVER_ENABLE
-        oled_timer = timer_read32();
-#endif
+        inactivity_timer = timer_read32();
+        #ifdef RGBLIGHT_ENABLE
+        if (rgblight_config.enable) {
+		    rgblight_enable_noeeprom();
+	    }
+        #endif
     // set_timelog();
   }
 //   static uint16_t my_colon_timer;
