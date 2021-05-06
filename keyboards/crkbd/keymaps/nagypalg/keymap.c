@@ -45,7 +45,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             rgblight_sethsv_noeeprom(HSV_GREEN);
             break;
         case 2:
-            rgblight_sethsv_noeeprom(HSV_MAGENTA);
+            rgblight_sethsv_noeeprom(HSV_PINK);
             break;
         case 3:
             rgblight_sethsv_noeeprom(HSV_ORANGE);
@@ -64,12 +64,6 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 #endif
-
-// void matrix_init_user(void) {
-//     #ifdef RGBLIGHT_ENABLE
-//       RGB_current_mode = rgblight_config.mode;
-//     #endif
-// }
 
 #ifdef OLED_DRIVER_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_270; }
@@ -227,17 +221,7 @@ void render_layer_state(void) {
 
     static const char PROGMEM mouse_layer[] = {0x20, 0x97, 0x98, 0x99, 0x20, 0x20, 0xba, 0xbb, 0xbc, 0x20, 0x20, 0xda, 0xdb, 0xdc, 0x20, 0};
 
-    // static const char PROGMEM raise_layer[] = {
-    //     0x20, 0x97, 0x98, 0x99, 0x20,
-    //     0x20, 0xb7, 0xb8, 0xb9, 0x20,
-    //     0x20, 0xd7, 0xd8, 0xd9, 0x20, 0};
-    // static const char PROGMEM lower_layer[] = {
-    //     0x20, 0x9a, 0x9b, 0x9c, 0x20,
-    //     0x20, 0xba, 0xbb, 0xbc, 0x20,
-    //     0x20, 0xda, 0xdb, 0xdc, 0x20, 0};
     static const char PROGMEM other_layer[] = {0x20, 0x9d, 0x9e, 0x9f, 0x20, 0x20, 0xbd, 0xbe, 0xbf, 0x20, 0x20, 0xdd, 0xde, 0xdf, 0x20, 0};
-
-    // uint8_t layer = get_highest_layer(layer_state);
 
     switch (get_highest_layer(layer_state)) {
         case _BASE:
