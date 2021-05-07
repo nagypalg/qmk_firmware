@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // #define TAPPING_FORCE_HOLD
 #define TAPPING_TERM 200
-#define RETRO_TAPPING
+//#define RETRO_TAPPING
 #define IGNORE_MOD_TAP_INTERRUPT
 
 #define AUTO_SHIFT_TIMEOUT 175

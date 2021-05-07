@@ -40,6 +40,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT_split
 extern rgblight_config_t rgblight_config;
 
 layer_state_t layer_state_set_user(layer_state_t state) {
+    if (rgblight_is_enabled()) {
+        rgblight_enable_noeeprom();
+    }
     switch (get_highest_layer(state)) {
         case 1:
             rgblight_sethsv_noeeprom(HSV_GREEN);
@@ -65,10 +68,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 layer_state_t default_layer_state_set_user(layer_state_t state) {
-    rgblight_sethsv_noeeprom(HSV_TEAL);
-    rgblight_config.raw = eeconfig_read_rgblight();
-    if (rgblight_config.enable) {
+    // rgblight_config.raw = eeconfig_read_rgblight();
+    if (rgblight_is_enabled()) {
         rgblight_enable_noeeprom();
+        rgblight_sethsv_noeeprom(HSV_TEAL);
     }
     return state;
 }
@@ -299,7 +302,6 @@ void matrix_scan_user(void) {
 #ifdef RGBLIGHT_ENABLE
     if (timer_elapsed32(inactivity_timer) > 30000) {
         rgblight_disable_noeeprom();
-        return;
     }
 #endif
 }
@@ -311,8 +313,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef RGBLIGHT_ENABLE
+    rgblight_config.raw = eeconfig_read_rgblight();
+    if (rgblight_is_enabled() && IS_LAYER_ON(0)) {
+        rgblight_enable_noeeprom();
+    }
+#endif
+    return;
+}
+
 void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE
-    rgblight_sethsv_noeeprom(HSV_TEAL);
+    rgblight_config.raw = eeconfig_read_rgblight();
+    if (rgblight_is_enabled()) {
+        rgblight_enable_noeeprom();
+        rgblight_sethsv_noeeprom(HSV_TEAL);
+    }
 #endif
 }
