@@ -3,8 +3,18 @@
 extern keymap_config_t keymap_config;
 
 static uint32_t inactivity_timer = 0;
+static bool     is_sleeping      = false;
+
+#ifdef SLEEP_TIMEOUT
+static uint16_t sleep_timeout = SLEEP_TIMEOUT;
+#endif
+#ifndef SLEEP_TIMEOUT
+static uint16_t sleep_timeout = 30000;
+#endif
 
 extern uint8_t is_master;
+
+extern layer_state_t layer_state;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -33,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT_split
                                                               [2] = LAYOUT_split_3x6_3(KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_LCBR, KC_RCBR, KC_GRV, KC_TRNS, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_LPRN, KC_RPRN, KC_SCLN, KC_EQL, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_LBRC, KC_RBRC, KC_BSLS, KC_MINS, KC_TRNS, KC_NO, KC_TRNS, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
                                                               [3] = LAYOUT_split_3x6_3(KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_INS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_RSFT, KC_NO, KC_NO, KC_HOME, KC_PGDN, KC_PGUP, KC_END, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
                                                               [4] = LAYOUT_split_3x6_3(KC_NO, KC_NO, KC_TRNS, C_S_F, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F11, KC_NO, KC_ESC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F10, KC_NO, KC_NO, KC_NO, KC_NO, C_S_C, KC_NO, C_S_V, KC_NO, KC_F1, KC_F2, KC_F3, KC_F12, KC_TRNS, KC_NO, KC_NO, KC_TRNS, KC_DEL, KC_TRNS, KC_TRNS),
-                                                              [5] = LAYOUT_split_3x6_3(KC_TRNS, KC_MPRV, KC_LGUI, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, RESET, RGB_TOG, KC_LSFT, KC_LALT, KC_LCTL, KC_RSFT, KC_TRNS, KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, KC_NO, KC_NO, KC_NO, KC_ACL0, KC_ACL1, KC_ACL2, KC_NO, KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, KC_NO, KC_BTN3, KC_BTN1, KC_BTN2, KC_BTN2, KC_BTN1, KC_BTN3)};
+                                                              [5] = LAYOUT_split_3x6_3(KC_TRNS, KC_MPRV, KC_LGUI, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, RESET, RGB_TOG, KC_LSFT, KC_LALT, KC_LCTL, KC_RSFT, KC_TRNS, KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, KC_NO, EEP_RST, KC_NO, KC_ACL0, KC_ACL1, KC_ACL2, KC_NO, KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, KC_NO, KC_BTN3, KC_BTN1, KC_BTN2, KC_BTN2, KC_BTN1, KC_BTN3)};
 
 #ifdef RGBLIGHT_ENABLE
 // Following line allows macro to read current RGB settings
@@ -279,7 +289,7 @@ void render_status_secondary(void) {
 }
 
 void oled_task_user(void) {
-    if (timer_elapsed32(inactivity_timer) > 30000) {
+    if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
         oled_off();
         return;
     }
@@ -299,29 +309,44 @@ void oled_task_user(void) {
 #endif
 
 void matrix_scan_user(void) {
+    if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
+        is_sleeping = true;
 #ifdef RGBLIGHT_ENABLE
-    if (timer_elapsed32(inactivity_timer) > 30000) {
         rgblight_disable_noeeprom();
-    }
 #endif
+    } else {
+        if (is_sleeping) {
+            is_sleeping = false;
+#ifdef RGBLIGHT_ENABLE
+            rgblight_config.raw = eeconfig_read_rgblight();
+            if (rgblight_is_enabled()) {
+                rgblight_enable_noeeprom();
+                layer_state_set_user(layer_state);
+                // rgblight_sethsv_noeeprom(HSV_TEAL);
+            }
+#endif
+        }
+    }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        inactivity_timer = timer_read32();
-    }
+    // there was user activity
+    inactivity_timer = timer_read32();
+    // if (record->event.pressed) {
+
+    // }
     return true;
 }
 
-void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef RGBLIGHT_ENABLE
-    rgblight_config.raw = eeconfig_read_rgblight();
-    if (rgblight_is_enabled() && IS_LAYER_ON(0)) {
-        rgblight_enable_noeeprom();
-    }
-#endif
-    return;
-}
+// void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
+// #ifdef RGBLIGHT_ENABLE
+//     rgblight_config.raw = eeconfig_read_rgblight();
+//     if (rgblight_is_enabled() && IS_LAYER_ON(0)) {
+//         rgblight_enable_noeeprom();
+//     }
+// #endif
+//     return;
+// }
 
 void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE

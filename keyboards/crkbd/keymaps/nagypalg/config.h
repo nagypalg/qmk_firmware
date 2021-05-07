@@ -111,3 +111,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #   define DISABLE_RGB_MATRIX_SOLID_SPLASH
 #   define DISABLE_RGB_MATRIX_SOLID_MULTISPLASH
 #endif
+
+// Own customizations from here
+#define SLEEP_TIMEOUT 10000
