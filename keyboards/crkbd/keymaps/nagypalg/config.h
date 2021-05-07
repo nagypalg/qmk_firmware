@@ -113,4 +113,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 // Own customizations from here
-#define SLEEP_TIMEOUT 10000
+#define SLEEP_TIMEOUT 60000 // one minute
