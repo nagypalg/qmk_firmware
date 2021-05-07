@@ -63,6 +63,15 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     }
     return state;
 }
+
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+    rgblight_sethsv_noeeprom(HSV_TEAL);
+    rgblight_config.raw = eeconfig_read_rgblight();
+    if (rgblight_config.enable) {
+        rgblight_enable_noeeprom();
+    }
+    return state;
+}
 #endif
 
 #ifdef OLED_DRIVER_ENABLE
@@ -298,12 +307,6 @@ void matrix_scan_user(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         inactivity_timer = timer_read32();
-#ifdef RGBLIGHT_ENABLE
-        rgblight_config.raw = eeconfig_read_rgblight();
-        if (rgblight_config.enable) {
-            rgblight_enable_noeeprom();
-        }
-#endif
     }
     return true;
 }
