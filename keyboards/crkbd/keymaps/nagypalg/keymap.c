@@ -52,24 +52,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT_split
 extern rgblight_config_t rgblight_config;
 
 layer_state_t layer_state_set_user(layer_state_t state) {
+#    ifdef CONSOLE_ENABLE
     dprintf("layer_state_set_user\n");
-    // if (rgblight_is_enabled()) {
-    //     rgblight_enable_noeeprom();
-    // }
+#    endif
     switch (get_highest_layer(state)) {
-        case 1:
+        case _NUM:
             rgblight_sethsv_noeeprom(HSV_GREEN);
             break;
-        case 2:
+        case _SYM:
             rgblight_sethsv_noeeprom(HSV_PINK);
             break;
-        case 3:
+        case _NAV:
             rgblight_sethsv_noeeprom(HSV_ORANGE);
             break;
-        case 4:
+        case _FUNC:
             rgblight_sethsv_noeeprom(HSV_BLUE);
             break;
-        case 5:
+        case _MOUSE:
             rgblight_sethsv_noeeprom(HSV_YELLOW);
             break;
         default:
@@ -77,16 +76,6 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             rgblight_sethsv_noeeprom(HSV_TEAL);
             break;
     }
-    return state;
-}
-
-layer_state_t default_layer_state_set_user(layer_state_t state) {
-    dprintf("default_layer_state_set_user\n");
-        rgblight_sethsv_noeeprom(HSV_TEAL);
-    // rgblight_config.raw = eeconfig_read_rgblight();
-    // if (rgblight_is_enabled()) {
-    //     rgblight_enable_noeeprom();
-    // }
     return state;
 }
 #endif
@@ -293,19 +282,6 @@ void render_status_secondary(void) {
 }
 
 void oled_task_user(void) {
-    // dprintf("oled_task_user\n");
-    // if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
-    //     dprintf("inactivity timer has ellapsed, oled off\n");
-    //     oled_off();
-    //     return;
-    // }
-    // #    ifndef SPLIT_KEYBOARD
-    //     else {
-    //         dprintf("oled on\n");
-    //         oled_on();
-    //     }
-    // #    endif
-
     if (is_sleeping) {
         return;
     }
@@ -320,8 +296,11 @@ void oled_task_user(void) {
 
 void matrix_scan_user(void) {
     if ((timer_elapsed32(inactivity_timer) > sleep_timeout)) {
+        // user was inactive
         if (!is_sleeping) {
+            // and we are not yet sleeping
 #ifdef CONSOLE_ENABLE
+            dprintf("Sleep timeout: %d", sleep_timeout);
             dprintf("Setting is_sleeping to true\n");
 #endif
             is_sleeping = true;
@@ -333,7 +312,9 @@ void matrix_scan_user(void) {
 #endif
         }
     } else {
+        // there was user activity
         if (is_sleeping) {
+            // but we are still sleeping
 #ifdef CONSOLE_ENABLE
             dprintf("Setting is_sleeping to false\n");
 #endif
@@ -357,24 +338,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #ifdef CONSOLE_ENABLE
     dprintf("KL: kc: 0x%04X, col: %u, row: %u, pressed: %b, time: %u, interrupt: %b, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
 #endif
-    // there was user activity
+    // there was user activity, reset the inactivity timer
     inactivity_timer = timer_read32();
-    // if (record->event.pressed) {
-
-    // }
-
     return true;
 }
-
-// void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-// #ifdef RGBLIGHT_ENABLE
-//     rgblight_config.raw = eeconfig_read_rgblight();
-//     if (rgblight_is_enabled() && IS_LAYER_ON(0)) {
-//         rgblight_enable_noeeprom();
-//     }
-// #endif
-//     return;
-// }
 
 void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE
@@ -392,7 +359,5 @@ void keyboard_post_init_user(void) {
     // debug_matrix   = true;
     debug_keyboard = true;
     // debug_mouse=true;
-    dprintf("Debug mode enabled");
-    dprintf("Sleep timeout: %d", sleep_timeout);
 #endif
 }

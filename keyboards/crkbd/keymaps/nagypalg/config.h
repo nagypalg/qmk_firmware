@@ -113,6 +113,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 // Own customizations from here
-#define SLEEP_TIMEOUT 10000 // one minute
+#define SLEEP_TIMEOUT 30000 // 30 seconds
 
 #define DEBUG_MATRIX_SCAN_RATE
