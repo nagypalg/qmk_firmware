@@ -1,5 +1,7 @@
 #include QMK_KEYBOARD_H
 
+#include "print.h"
+
 extern keymap_config_t keymap_config;
 
 static uint32_t inactivity_timer = 0;
@@ -50,9 +52,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT_split
 extern rgblight_config_t rgblight_config;
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    if (rgblight_is_enabled()) {
-        rgblight_enable_noeeprom();
-    }
+    dprintf("layer_state_set_user\n");
+    // if (rgblight_is_enabled()) {
+    //     rgblight_enable_noeeprom();
+    // }
     switch (get_highest_layer(state)) {
         case 1:
             rgblight_sethsv_noeeprom(HSV_GREEN);
@@ -78,11 +81,12 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 layer_state_t default_layer_state_set_user(layer_state_t state) {
-    // rgblight_config.raw = eeconfig_read_rgblight();
-    if (rgblight_is_enabled()) {
-        rgblight_enable_noeeprom();
+    dprintf("default_layer_state_set_user\n");
         rgblight_sethsv_noeeprom(HSV_TEAL);
-    }
+    // rgblight_config.raw = eeconfig_read_rgblight();
+    // if (rgblight_is_enabled()) {
+    //     rgblight_enable_noeeprom();
+    // }
     return state;
 }
 #endif
@@ -289,16 +293,22 @@ void render_status_secondary(void) {
 }
 
 void oled_task_user(void) {
-    if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
-        oled_off();
+    // dprintf("oled_task_user\n");
+    // if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
+    //     dprintf("inactivity timer has ellapsed, oled off\n");
+    //     oled_off();
+    //     return;
+    // }
+    // #    ifndef SPLIT_KEYBOARD
+    //     else {
+    //         dprintf("oled on\n");
+    //         oled_on();
+    //     }
+    // #    endif
+
+    if (is_sleeping) {
         return;
     }
-#    ifndef SPLIT_KEYBOARD
-    else {
-        oled_on();
-    }
-#    endif
-
     if (is_master) {
         render_status_main();  // Renders the current keyboard state (layer, lock, caps, scroll, etc)
     } else {
@@ -309,32 +319,50 @@ void oled_task_user(void) {
 #endif
 
 void matrix_scan_user(void) {
-    if (timer_elapsed32(inactivity_timer) > sleep_timeout) {
-        is_sleeping = true;
-#ifdef RGBLIGHT_ENABLE
-        rgblight_disable_noeeprom();
+    if ((timer_elapsed32(inactivity_timer) > sleep_timeout)) {
+        if (!is_sleeping) {
+#ifdef CONSOLE_ENABLE
+            dprintf("Setting is_sleeping to true\n");
 #endif
+            is_sleeping = true;
+#ifdef RGBLIGHT_ENABLE
+            rgblight_disable_noeeprom();
+#endif
+#ifdef OLED_DRIVER_ENABLE
+            oled_off();
+#endif
+        }
     } else {
         if (is_sleeping) {
+#ifdef CONSOLE_ENABLE
+            dprintf("Setting is_sleeping to false\n");
+#endif
             is_sleeping = false;
 #ifdef RGBLIGHT_ENABLE
             rgblight_config.raw = eeconfig_read_rgblight();
             if (rgblight_is_enabled()) {
+                dprintf("rgblight is enabled, switching on\n");
                 rgblight_enable_noeeprom();
                 layer_state_set_user(layer_state);
-                // rgblight_sethsv_noeeprom(HSV_TEAL);
             }
+#endif
+#ifdef OLED_DRIVER_ENABLE
+            oled_on();
 #endif
         }
     }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef CONSOLE_ENABLE
+    dprintf("KL: kc: 0x%04X, col: %u, row: %u, pressed: %b, time: %u, interrupt: %b, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+#endif
     // there was user activity
     inactivity_timer = timer_read32();
     // if (record->event.pressed) {
 
     // }
+
     return true;
 }
 
@@ -355,5 +383,16 @@ void keyboard_post_init_user(void) {
         rgblight_enable_noeeprom();
         rgblight_sethsv_noeeprom(HSV_TEAL);
     }
+#endif
+#ifdef OLED_DRIVER_ENABLE
+    oled_on();
+#endif
+#ifdef CONSOLE_ENABLE
+    debug_enable = true;
+    // debug_matrix   = true;
+    debug_keyboard = true;
+    // debug_mouse=true;
+    dprintf("Debug mode enabled");
+    dprintf("Sleep timeout: %d", sleep_timeout);
 #endif
 }
