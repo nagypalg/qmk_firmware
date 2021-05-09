@@ -7,6 +7,8 @@ extern keymap_config_t keymap_config;
 static uint32_t inactivity_timer = 0;
 static bool     is_sleeping      = false;
 
+static bool     is_caps_lock_on  = false;
+
 #ifdef SLEEP_TIMEOUT
 static uint16_t sleep_timeout = SLEEP_TIMEOUT;
 #endif
@@ -46,6 +48,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {[0] = LAYOUT_split
                                                               [3] = LAYOUT_split_3x6_3(KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_INS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_RSFT, KC_NO, KC_NO, KC_HOME, KC_PGDN, KC_PGUP, KC_END, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_LEFT, KC_DOWN, KC_UP, KC_RGHT, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_DEL, KC_TRNS, KC_TRNS),
                                                               [4] = LAYOUT_split_3x6_3(KC_NO, KC_NO, KC_TRNS, C_S_F, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F11, KC_NO, KC_ESC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F10, KC_NO, KC_NO, KC_NO, KC_NO, C_S_C, KC_NO, C_S_V, KC_NO, KC_F1, KC_F2, KC_F3, KC_F12, KC_TRNS, KC_NO, KC_NO, KC_TRNS, KC_DEL, KC_TRNS, KC_TRNS),
                                                               [5] = LAYOUT_split_3x6_3(KC_TRNS, KC_MPRV, KC_LGUI, KC_MPLY, KC_MNXT, KC_NO, KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_NO, RESET, RGB_TOG, KC_LSFT, KC_LALT, KC_LCTL, KC_RSFT, KC_TRNS, KC_NO, KC_WH_L, KC_WH_D, KC_WH_U, KC_WH_R, KC_NO, EEP_RST, KC_NO, KC_ACL0, KC_ACL1, KC_ACL2, KC_NO, KC_NO, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, KC_NO, KC_BTN3, KC_BTN1, KC_BTN2, KC_BTN2, KC_BTN1, KC_BTN3)};
+
+
+bool led_update_user(led_t led_state) {
+    is_caps_lock_on = led_state.caps_lock;
+    return true;
+}
 
 #ifdef RGBLIGHT_ENABLE
 // Following line allows macro to read current RGB settings
@@ -172,45 +180,49 @@ void render_mod_status_ctrl_shift(uint8_t modifiers) {
     static const char PROGMEM on_on_1[]   = {0xcb, 0};
     static const char PROGMEM on_on_2[]   = {0xcc, 0};
 
-    if (modifiers & MOD_MASK_CTRL) {
+    bool is_ctrl_on = (modifiers & MOD_MASK_CTRL);
+    bool is_shift_on = (modifiers & MOD_MASK_SHIFT) || is_caps_lock_on;
+
+    if (is_ctrl_on) {
         oled_write_P(ctrl_on_1, false);
     } else {
         oled_write_P(ctrl_off_1, false);
     }
 
-    if ((modifiers & MOD_MASK_CTRL) && (modifiers & MOD_MASK_SHIFT)) {
+
+    if (is_ctrl_on && is_shift_on) {
         oled_write_P(on_on_1, false);
-    } else if (modifiers & MOD_MASK_CTRL) {
+    } else if (is_ctrl_on) {
         oled_write_P(on_off_1, false);
-    } else if (modifiers & MOD_MASK_SHIFT) {
+    } else if (is_shift_on) {
         oled_write_P(off_on_1, false);
     } else {
         oled_write_P(off_off_1, false);
     }
 
-    if (modifiers & MOD_MASK_SHIFT) {
+    if (is_shift_on) {
         oled_write_P(shift_on_1, false);
     } else {
         oled_write_P(shift_off_1, false);
     }
 
-    if (modifiers & MOD_MASK_CTRL) {
+    if (is_ctrl_on) {
         oled_write_P(ctrl_on_2, false);
     } else {
         oled_write_P(ctrl_off_2, false);
     }
 
-    if (modifiers & MOD_MASK_CTRL & MOD_MASK_SHIFT) {
+    if (is_ctrl_on && is_shift_on) {
         oled_write_P(on_on_2, false);
-    } else if (modifiers & MOD_MASK_CTRL) {
+    } else if (is_ctrl_on) {
         oled_write_P(on_off_2, false);
-    } else if (modifiers & MOD_MASK_SHIFT) {
+    } else if (is_shift_on) {
         oled_write_P(off_on_2, false);
     } else {
         oled_write_P(off_off_2, false);
     }
 
-    if (modifiers & MOD_MASK_SHIFT) {
+    if (is_shift_on) {
         oled_write_P(shift_on_2, false);
     } else {
         oled_write_P(shift_off_2, false);
